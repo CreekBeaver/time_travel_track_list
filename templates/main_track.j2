@@ -1,0 +1,40 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Time Travelling Track List Generator</title>
+  <meta name="" content="">
+  <meta name="author" content="creekk@oregonstate.edu">
+
+  <link rel="stylesheet" href="css/styles.css?v=1.0">
+
+</head>
+
+<body>
+    <h1> Time Travelling Track List</h1>
+    <p> [This is a paragraph that is going to explain what this silly thing does]</p>
+
+    <form method="post" action="/">
+        <p>Date <input type="date" name="date"/></p>
+        <p>Number of Tracks <input type="number" name="num_tracks"/></p>
+        <p><input type="submit" value="submit" name="generate"/></p>
+    </form>
+
+
+    <div id="content_space">
+        <ul id="display_tracks">
+            {% for item in tracks %}
+            <li>{{ item }}</li>
+            {% endfor %}
+        </ul>
+
+    </div>
+
+
+
+
+</body>
+</html>
