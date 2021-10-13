@@ -1,8 +1,57 @@
 from flask import Flask, render_template, json, request
 import random
 import os
-
+import datetime
+from scrape_test import non_api_scrape
 # Define Helper Functions
+
+
+def find_sunday(date):
+    """
+    Function will take a given date and return the Sunday of that week
+    :param date: string. Format YYYY-MM-DD
+    :return: Date. String containing the sunday of that week in 'YYYY-MM-DD' format
+
+    """
+    # Split the string into three separate values
+    date_list = date.split('-')
+
+    # d places this into the date-time format.
+    d = datetime.datetime(int(date_list[0]), int(date_list[1]), int(date_list[2]))
+    if d.weekday() == 6:
+        return date
+    else:
+        start = d - datetime.timedelta(days=d.weekday())
+        sunday = start - datetime.timedelta(days=1)
+        r_string = sunday.strftime('%Y-%m-%d')
+        return r_string
+
+
+def hyper_linker(track_list):
+	"""
+	Takes a track list then returns a mirrored List with associated
+	Youtube Query_Strings
+	:param track_list: List containing tracks
+	:return: Hyperlinks for each track
+	"""
+
+	return_list = []
+
+	for track in track_list:
+		base_url = 'https://www.youtube.com/results?search_query='
+		# Split the tracks into their components:
+		split_track = track.split(" ")
+		# -- To Do: Find a Way To Strip the special characters
+		# handle one length tracks
+		if len(split_track) == 1:
+			base_url += split_track[0]
+			return_list.append(base_url)
+		else:
+			pass
+
+	return return_list
+
+
 def tracklist_generator(num_tracks, date):
 	"""
 	tracklist_generator will take a provided number of tracks and date and call on
@@ -12,16 +61,17 @@ def tracklist_generator(num_tracks, date):
 	:return:
 	"""
 
-	#-- This will need internal checks to sanitize the data. --#
+	# -- To Do: Add Check to ensure that the Track List input is a positive integer.
+	# -- To Do: Verify that the Number of Tracks Does Not Exceed 100.
+	# -- To Do: Add Check to Make Sure that the Date is not in the Future
+	# This will sanize to ensure that the date is the sunday for the query string.
+	sunday = find_sunday(date)
 
-	# Once Sanitized, send the data to the Microservice
+	#Build an HTTP Request for the service
+
 
 	# After Recieved from the microservice, Translate the data into something readable
-	# raw_tracks = [Call to microservice]
-
-	raw_tracks = []
-	for i in range(1, 100):
-		raw_tracks.append(i)
+	raw_tracks = non_api_scrape(sunday)
 
 	# --- Randomly Select tracks from a list to return ---#
 	return_list = []
@@ -66,10 +116,11 @@ def root():
 	# This will handle when the button is pressed and cause everything to happen.
 	if request.method == 'POST':
 		if request.form.get('generate') == 'submit':
-			#date = request.form.get('date')
+			date = request.form.get('date')
+			print('here is the date', date)
 			num_tracks = request.form.get('num_tracks')
 			#list = tracklist_generator(num_tracks, date)
-			track_list = tracklist_generator(int(num_tracks), 'placeholder')
+			track_list = tracklist_generator(int(num_tracks), date)
 		return render_template("main_track.j2", tracks=track_list)
 
 
