@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>Time Travelling Track List Generator</title>
+  <title>Time Traveling Track List Generator</title>
   <meta name="" content="">
   <meta name="author" content="creekk@oregonstate.edu">
 
@@ -23,18 +23,19 @@
         <p><input type="submit" value="submit" name="generate"/></p>
     </form>
 
-
     <div id="content_space">
-        <ul id="display_tracks">
-            {% for item in tracks %}
-            <li>{{ item }}</li>
-            {% endfor %}
+        <ul>
+        <!-- Iterate through each key in the first entry to get the column name -->
+        {% for key in context.keys() %}
+
+        <!-- Create a <th> tag with the key inside of it, this will be our header row -->
+            <li><a href="{{ context[key] }}">{{ key }}</a></li>
+
+        <!-- End of this for loop -->
+         {% endfor %}
         </ul>
 
     </div>
-
-
-
 
 </body>
 </html>

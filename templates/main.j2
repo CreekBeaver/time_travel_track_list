@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>Time Travelling Track List Generator</title>
+  <title>Time Traveling Track List Generator</title>
   <meta name="" content="">
   <meta name="author" content="creekk@oregonstate.edu">
 
@@ -15,7 +15,13 @@
 
 <body>
     <h1> Time Travelling Track List</h1>
-    <p> [This is a paragraph that is going to explain what this silly thing does]</p>
+    <p>  User is able to provide a date in time
+        (given it is AFTER the inception of the Billboard Top 100) and a
+        number of Tracks. The application will then provide the user with a
+        track list, the length as provided by the user, consisting of randomly
+        selected tracks from that time period that were on the Billboard 100
+        Playlist.  Each track will be  hyperlinked to a different site where
+        they can hear the song be played. </p>
 
     <form method="post" action="/">
         <p>Date <input type="date" name="date"/></p>
@@ -29,7 +35,7 @@
 
 
     <div id="content_space">
-        This is where the content will be printed out.
+        {{ error }}
     </div>
 
 

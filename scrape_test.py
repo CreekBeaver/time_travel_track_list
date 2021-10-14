@@ -34,9 +34,6 @@ def non_api_scrape(date):
 
     return clean_list
 
-#test = non_api_scrape(3, '2021-10-09')
-#for row in test:
-#    print(test)
 
 def find_sunday(date):
     """

@@ -3,6 +3,7 @@ import random
 import os
 import datetime
 from scrape_test import non_api_scrape
+from urllib.parse import quote
 # Define Helper Functions
 
 
@@ -38,16 +39,8 @@ def hyper_linker(track_list):
 	return_list = []
 
 	for track in track_list:
-		base_url = 'https://www.youtube.com/results?search_query='
-		# Split the tracks into their components:
-		split_track = track.split(" ")
-		# -- To Do: Find a Way To Strip the special characters
-		# handle one length tracks
-		if len(split_track) == 1:
-			base_url += split_track[0]
-			return_list.append(base_url)
-		else:
-			pass
+		base_url = 'https://www.youtube.com/results?search_query='+ quote(track)
+		return_list.append(base_url)
 
 	return return_list
 
@@ -61,13 +54,11 @@ def tracklist_generator(num_tracks, date):
 	:return:
 	"""
 
-	# -- To Do: Add Check to ensure that the Track List input is a positive integer.
-	# -- To Do: Verify that the Number of Tracks Does Not Exceed 100.
-	# -- To Do: Add Check to Make Sure that the Date is not in the Future
 	# This will sanize to ensure that the date is the sunday for the query string.
+
 	sunday = find_sunday(date)
 
-	#Build an HTTP Request for the service
+	# -- To Do: Build an HTTP Request for the service
 
 
 	# After Recieved from the microservice, Translate the data into something readable
@@ -85,21 +76,60 @@ def tracklist_generator(num_tracks, date):
 		# Remove the track from the raw_tracks List
 		raw_tracks.pop(index)
 
-	# This is where I will Call to Hyperlink each of the tracks in the list
-
 	return return_list
 
+def zipper(l1, l2):
+	i = 0
+	d = {}
+	while i < len(l1):
+		d[l1[i]] = l2[i]
+		i += 1
+	return d
 
-def hyperlinker(track_lsit):
-	"""
-	hperlinker will take an input track list and return the same list in the form of hyperlinks
-	where the users can hear the songs within the playlist.
-	:param track_lsit:
-	:return:
-	"""
+def data_verification(date, num_tracks):
 
-	# This will also require some kind of data sanitization
-	pass
+	data_check = [True,0]
+
+	# -- Handle 0 Length date input
+	if len(date) == 0 and len(num_tracks) == 0:
+		error_string = "We're Sorry, it appaers you need to enter a date and time"
+		data_check[0] = False
+		data_check[1] = error_string
+		return data_check
+
+	if len(date) == 0:
+		error_string = "Please enter a date"
+		data_check[0] = False
+		data_check[1] = error_string
+		return data_check
+
+	if len(num_tracks) == 0:
+		error_string = "Please enter a number of tracks"
+		data_check[0] = False
+		data_check[1] = error_string
+		return data_check
+
+	# -- To Do: Add Check to ensure that the Track List input is a positive integer.
+	if int(num_tracks) < 1 or int(num_tracks) > 100:
+		error_string = "I'm Sorry, you have entered either too many or two few tracks\n"
+		error_string += "Please enter a number of tracks greater than 0, or less than 100"
+		data_check[0] = False
+		data_check[1] = error_string
+		return data_check
+	# -- To Do: Add Check to Make Sure that the Date is not in the Future
+
+	# Split the date
+	date_list = date.split('-')
+	date_compare = datetime.datetime(int(date_list[0]), int(date_list[1]), int(date_list[2]))
+	date_now = datetime.datetime.now()
+
+	if date_compare > date_now:
+		error_string = "I'm Sorry, your date is in the future, please try again with a different date"
+		data_check[0] = False
+		data_check[1] = error_string
+		return data_check
+	else:
+		return data_check
 
 
 # Configuration
@@ -111,17 +141,30 @@ app = Flask(__name__)
 def root():
 	# This will handle the initial requests to the Page
 	if request.method == 'GET':
-		return render_template('main.j2')
+		return render_template('main.j2', error='')
 
 	# This will handle when the button is pressed and cause everything to happen.
 	if request.method == 'POST':
 		if request.form.get('generate') == 'submit':
 			date = request.form.get('date')
-			print('here is the date', date)
 			num_tracks = request.form.get('num_tracks')
-			#list = tracklist_generator(num_tracks, date)
-			track_list = tracklist_generator(int(num_tracks), date)
-		return render_template("main_track.j2", tracks=track_list)
+			print('here is date', type(date))
+
+			data_check = data_verification(date, num_tracks)
+
+			# Verify the Data
+			if data_check[0] == False:
+				return render_template('main.j2', error=data_check[1])
+			else:
+				# Create the Track List
+				track_list = tracklist_generator(int(num_tracks), date)
+
+				# Create the Hyperlink List
+				hyper_link_list = hyper_linker(track_list)
+
+				# Make a Dictionary of the lists
+				track_dictionary = zipper(track_list, hyper_link_list)
+				return render_template("main_track.j2", context=track_dictionary, tracks=track_list, hyperlink=hyper_link_list)
 
 
 # Listener
