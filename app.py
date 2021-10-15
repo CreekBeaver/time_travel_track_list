@@ -6,7 +6,7 @@ from scrape_test import non_api_scrape
 from urllib.parse import quote
 # Define Helper Functions
 
-
+# This Function Should Not Change
 def find_sunday(date):
     """
     Function will take a given date and return the Sunday of that week
@@ -86,6 +86,7 @@ def zipper(l1, l2):
 		i += 1
 	return d
 
+# This Function Should Not Change
 def data_verification(date, num_tracks):
 
 	data_check = [True,0]
@@ -167,7 +168,7 @@ def root():
 				return render_template("main_track.j2", context=track_dictionary, tracks=track_list, hyperlink=hyper_link_list)
 
 
-# Listener
+# Listener - Will Need to Change when loaded onto the server.
 if __name__ == "__main__":
 	port = int(os.environ.get("PORT", 9112))
 	app.run(port=port, debug=True)

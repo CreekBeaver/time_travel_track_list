@@ -7,6 +7,31 @@
 import requests
 from bs4 import BeautifulSoup
 import datetime
+import re
+
+
+def medicine_server(medicine_name):
+    # Wikipedia URL: https://en.wikipedia.org/wiki/[name]
+    wiki_url = 'https://en.wikipedia.org/wiki/' + str(medicine_name)
+
+    # Call the Wikipedia
+    wiki_response = requests.get(wiki_url)
+    soup = BeautifulSoup(wiki_response.content, 'html.parser')
+
+    # Need to extract the Medline Plus URL
+    #medline_url = soup.find_all('a', {'class' : 'external text'}, href=True)
+    medline_url = soup.find('a', attrs={'href': re.compile("^https://medlineplus.gov")}).get('href')
+
+
+    # Now call the medline Plus URL
+    medline_response = requests.get(medline_url)
+
+    soup2 = BeautifulSoup(medline_response.content, 'html.parser')
+    how_section = soup2.find('div', attrs={'id': 'how',})
+    how_section2 = how_section.find_all('div', class_='section-body')
+    description = how_section2[0].text.strip()
+
+    return {'url': medline_url, 'howToTake': description}
 
 
 def non_api_scrape(date):
@@ -55,5 +80,4 @@ def find_sunday(date):
         r_string = sunday.strftime('%Y-%m-%d')
         return r_string
 
-
-d = find_sunday('2014-02-07')
+test = medicine_server('advil')
