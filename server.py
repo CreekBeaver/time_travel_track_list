@@ -83,4 +83,7 @@ def root():
 
 
 if __name__ == '__main__':
-    app.run(port=9115, debug=True)
+    # This is the line for Local Debugging
+    #app.run(port=9115, debug=True)
+    # This is the line for the Server
+    app.run()
