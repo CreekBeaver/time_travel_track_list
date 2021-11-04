@@ -1,7 +1,7 @@
 from flask import Flask, request
 import os
 import json
-import requests
+import flask
 
 # Configuration
 app = Flask(__name__)
@@ -33,7 +33,7 @@ def medicine_scrape(medicine_name):
     how_section2 = how_section.find_all('div', class_='section-body')
     description = how_section2[0].text.strip()
 
-    return {'url': medline_url, 'howToTake': description}
+    return {'name':medicine_name, 'url': medline_url, 'howToTake': description}
 
 
 def non_api_scrape(date):
@@ -70,20 +70,27 @@ def root():
     if request.method == 'POST':
         # This gets the String Data in String form from the request
         request_json = request.get_json()
+        print('Here is the json as recieved', request_json)
 
         # This will parse the string into a dicitonary
         in_dict = json.loads(request_json)
 
         # Call the Function that will form the response
         server_response = medicine_scrape(in_dict['name'])
+        json_response = json.dumps(server_response)
 
-        return json.dumps(server_response)
+        # Create the response
+        response = flask.make_response(json_response)
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        # return json.dumps(server_response)
+        return response
+        #return json.dumps(server_response)
 
 # Listener
 
 
 if __name__ == '__main__':
     # This is the line for Local Debugging
-    #app.run(port=9115, debug=True)
+    app.run(port=9115, debug=True)
     # This is the line for the Server
-    app.run()
+    #app.run()

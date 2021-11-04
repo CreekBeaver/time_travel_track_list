@@ -4,6 +4,8 @@ import os
 import datetime
 from scrape_test import non_api_scrape
 from urllib.parse import quote
+import json
+import requests
 # Define Helper Functions
 
 # This Function Should Not Change
@@ -59,8 +61,15 @@ def tracklist_generator(num_tracks, date):
 	sunday = find_sunday(date)
 
 	# -- To Do: Build an HTTP Request for the service
+	# url = ''
+	# data = {'num_tacks': num_tracks, 'date': sunday }
+	# jsonData = json.dumps(data)
+	# response = request.post(url=url, json=jsonData)
+	# response_json = r.json()
 
 
+	'''
+	
 	# After Recieved from the microservice, Translate the data into something readable
 	raw_tracks = non_api_scrape(sunday)
 
@@ -75,8 +84,9 @@ def tracklist_generator(num_tracks, date):
 
 		# Remove the track from the raw_tracks List
 		raw_tracks.pop(index)
+	'''
 
-	return return_list
+	return 'hello'
 
 def zipper(l1, l2):
 	i = 0
@@ -93,7 +103,7 @@ def data_verification(date, num_tracks):
 
 	# -- Handle 0 Length date input
 	if len(date) == 0 and len(num_tracks) == 0:
-		error_string = "We're Sorry, it appaers you need to enter a date and time"
+		error_string = "We're Sorry, it appears you need to enter a date and time"
 		data_check[0] = False
 		data_check[1] = error_string
 		return data_check
