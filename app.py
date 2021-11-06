@@ -1,105 +1,16 @@
 from flask import Flask, render_template, json, request
-import random
 import os
 import datetime
-from scrape_test import non_api_scrape
 from urllib.parse import quote
 import json
 import requests
-# Define Helper Functions
 
-# This Function Should Not Change
-def find_sunday(date):
-    """
-    Function will take a given date and return the Sunday of that week
-    :param date: string. Format YYYY-MM-DD
-    :return: Date. String containing the sunday of that week in 'YYYY-MM-DD' format
-
-    """
-    # Split the string into three separate values
-    date_list = date.split('-')
-
-    # d places this into the date-time format.
-    d = datetime.datetime(int(date_list[0]), int(date_list[1]), int(date_list[2]))
-    if d.weekday() == 6:
-        return date
-    else:
-        start = d - datetime.timedelta(days=d.weekday())
-        sunday = start - datetime.timedelta(days=1)
-        r_string = sunday.strftime('%Y-%m-%d')
-        return r_string
+# -- Define Helper Functions --
 
 
-def hyper_linker(track_list):
-	"""
-	Takes a track list then returns a mirrored List with associated
-	Youtube Query_Strings
-	:param track_list: List containing tracks
-	:return: Hyperlinks for each track
-	"""
-
-	return_list = []
-
-	for track in track_list:
-		base_url = 'https://www.youtube.com/results?search_query='+ quote(track)
-		return_list.append(base_url)
-
-	return return_list
-
-
-def tracklist_generator(num_tracks, date):
-	"""
-	tracklist_generator will take a provided number of tracks and date and call on
-	a microservice to generate a random track list. It will return a list of songs
-	:param num_tracks:
-	:param date:
-	:return:
-	"""
-
-	# This will sanize to ensure that the date is the sunday for the query string.
-
-	sunday = find_sunday(date)
-
-	# -- To Do: Build an HTTP Request for the service
-	# url = ''
-	# data = {'num_tacks': num_tracks, 'date': sunday }
-	# jsonData = json.dumps(data)
-	# response = request.post(url=url, json=jsonData)
-	# response_json = r.json()
-
-
-	'''
-	
-	# After Recieved from the microservice, Translate the data into something readable
-	raw_tracks = non_api_scrape(sunday)
-
-	# --- Randomly Select tracks from a list to return ---#
-	return_list = []
-	while len(return_list) < num_tracks:
-		# Generate a Random value based on the remaining raw_track list size
-		index = random.randint(0, len(raw_tracks)-1) # random.randint = N such that a <= N <= B
-
-		# Append the Track to the return List
-		return_list.append(raw_tracks[index])
-
-		# Remove the track from the raw_tracks List
-		raw_tracks.pop(index)
-	'''
-
-	return 'hello'
-
-def zipper(l1, l2):
-	i = 0
-	d = {}
-	while i < len(l1):
-		d[l1[i]] = l2[i]
-		i += 1
-	return d
-
-# This Function Should Not Change
 def data_verification(date, num_tracks):
 
-	data_check = [True,0]
+	data_check = [True, 0]
 
 	# -- Handle 0 Length date input
 	if len(date) == 0 and len(num_tracks) == 0:
@@ -143,6 +54,71 @@ def data_verification(date, num_tracks):
 		return data_check
 
 
+def find_sunday(date):
+	"""
+	Function will take a given date and return the Sunday of that week
+	:param date: string. Format YYYY-MM-DD
+	:return: Date. String containing the sunday of that week in 'YYYY-MM-DD' format
+
+	"""
+	# Split the string into three separate values
+	date_list = date.split('-')
+
+	# d places this into the date-time format.
+	d = datetime.datetime(int(date_list[0]), int(date_list[1]), int(date_list[2]))
+	if d.weekday() == 6:
+		return date
+	else:
+		start = d - datetime.timedelta(days=d.weekday())
+		sunday = start - datetime.timedelta(days=1)
+		r_string = sunday.strftime('%Y-%m-%d')
+		return r_string
+
+
+def tracklist_generator(num_tracks, date):
+	"""
+	tracklist_generator will take a provided number of tracks and date and call on
+	a microservice to generate a random track list. It will return a list of songs
+	:param num_tracks:
+	:param date:
+	:return:
+	"""
+
+	# This will sanize to ensure that the date is the sunday for the query string.
+	sunday = find_sunday(date)
+
+	# -- To Do: Build an HTTP Request for the service
+	url = 'http://flip1.engr.oregonstate.edu:4519'
+	data = {'num_tracks': num_tracks, 'date': sunday}
+	jsonData = json.dumps(data)
+	print(jsonData)
+	response = requests.post(url=url, json=jsonData)
+	return_dict = response.json()
+
+	return return_dict
+
+
+def hyper_linker(track_dictionary):
+	"""
+	Takes a track list then returns a mirrored List with associated
+	Youtube Query_Strings
+	:param track_dictionary: Dictionary Containing Songs and Song Titles
+	:return: Dictionary with hyperlinked Music
+	"""
+
+	return_dictionary = {}
+
+	# Create the Return Dictionary to Pass to the Front End
+	for key in track_dictionary:
+		base_url = 'https://www.youtube.com/results?search_query=' + quote(key)
+		return_dictionary[key] = [track_dictionary[key], base_url]
+
+	return return_dictionary
+
+
+
+
+
 # Configuration
 app = Flask(__name__)
 
@@ -168,14 +144,13 @@ def root():
 				return render_template('main.j2', error=data_check[1])
 			else:
 				# Create the Track List
-				track_list = tracklist_generator(int(num_tracks), date)
+				track_dictionary = tracklist_generator(int(num_tracks), date)
 
 				# Create the Hyperlink List
-				hyper_link_list = hyper_linker(track_list)
+				hyper_link_dictionary = hyper_linker(track_dictionary)
 
 				# Make a Dictionary of the lists
-				track_dictionary = zipper(track_list, hyper_link_list)
-				return render_template("main_track.j2", context=track_dictionary, tracks=track_list, hyperlink=hyper_link_list)
+				return render_template("main_track.j2", context=hyper_link_dictionary)
 
 
 # Listener - Will Need to Change when loaded onto the server.

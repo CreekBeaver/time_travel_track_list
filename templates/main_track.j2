@@ -36,7 +36,7 @@
         {% for key in context.keys() %}
 
         <!-- Create a <th> tag with the key inside of it, this will be our header row -->
-            <li><a href="{{ context[key] }}">{{ key }}</a></li>
+            <li><a href="{{ context[key][1] }}">{{ key }}</a> By: {{context[key][0] }}</li>
 
         <!-- End of this for loop -->
          {% endfor %}
