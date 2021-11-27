@@ -4,6 +4,7 @@ import datetime
 from urllib.parse import quote
 import json
 import requests
+import random
 
 # -- Define Helper Functions --
 
@@ -107,8 +108,10 @@ def tracklist_generator(num_tracks, date):
 	jsonData = json.dumps(data)
 
 	# Call the microservice
+	print("Calling the microservice @ ", url, 'with', jsonData)
 	response = requests.post(url=url, json=jsonData)
 	return_dict = response.json()
+	print(return_dict)
 
 	return return_dict
 
@@ -165,6 +168,39 @@ def root():
 
 				# Make a Dictionary of the lists
 				return render_template("main_track.j2", context=hyper_link_dictionary)
+
+
+@app.route('/random', methods=['GET', 'POST'])
+def random_list():
+	if request.method == 'GET':
+		return render_template('main.j2', error='')
+
+	# How to handle a random response
+	if request.method == 'POST':
+		# Generate the Random Date
+		start_date = datetime.date(1958, 11, 1)
+		end_date = datetime.date.today()
+		time_delta = end_date - start_date
+		day_delta = time_delta.days
+		random_num_days = random.randrange(day_delta)
+		rand_date = str(start_date + datetime.timedelta(days=random_num_days))
+
+
+
+		# Generate the Random Track
+		num_tracks = random.randint(1, 100)
+
+
+		# Create the Track List
+		track_dictionary = tracklist_generator(int(num_tracks), rand_date)
+
+		# Create the Hyperlink List
+		hyper_link_dictionary = hyper_linker(track_dictionary)
+
+		# Make a Dictionary of the lists
+		return render_template("main_track.j2", context=hyper_link_dictionary)
+
+
 
 
 # Listener - Will Need to Change when loaded onto the server.

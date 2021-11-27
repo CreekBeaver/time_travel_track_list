@@ -60,24 +60,4 @@ def non_api_scrape(date):
     return clean_list
 
 
-def find_sunday(date):
-    """
-    Function will take a given date and return the Sunday of that week
-    :param date: string. Format YYYY-MM-DD
-    :return: Date. String containing the sunday of that week in 'YYYY-MM-DD' format
-
-    """
-    # Split the string into three separate values
-    date_list = date.split('-')
-
-    # d places this into the date-time format.
-    d = datetime.datetime(int(date_list[0]), int(date_list[1]), int(date_list[2]))
-    if d.weekday() == 6:
-        return date
-    else:
-        start = d - datetime.timedelta(days=d.weekday())
-        sunday = start - datetime.timedelta(days=1)
-        r_string = sunday.strftime('%Y-%m-%d')
-        return r_string
-
 test = medicine_server('advil')

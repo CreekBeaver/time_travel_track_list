@@ -29,7 +29,12 @@
         <p>Number of Tracks <input type="number" name="num_tracks"/></p>
         <span><input  type="submit" value="submit" name="generate"/></span>
     </form>
-
+    <form method="post" action="/random">
+        <p>
+            <input type="submit" id="random" value="Random" name="random"/>
+            <label for="random"> Make a Random Playlist! </label>
+        </p>
+    </form>
     <div id="content_space">
         <ul>
         <!-- Iterate through each key in the first entry to get the column name -->
