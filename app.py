@@ -185,8 +185,6 @@ def random_list():
 		random_num_days = random.randrange(day_delta)
 		rand_date = str(start_date + datetime.timedelta(days=random_num_days))
 
-
-
 		# Generate the Random Track
 		num_tracks = random.randint(1, 100)
 

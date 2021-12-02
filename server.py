@@ -21,7 +21,6 @@ def medicine_scrape(medicine_name):
     soup = BeautifulSoup(wiki_response.content, 'html.parser')
 
     # Need to extract the Medline Plus URL
-    # medline_url = soup.find_all('a', {'class' : 'external text'}, href=True)
     medline_url = soup.find('a', attrs={'href': re.compile("^https://medlineplus.gov")}).get('href')
 
     # Now call the medline Plus URL
@@ -43,9 +42,6 @@ def non_api_scrape(date):
     :return: List of songs
     """
 
-    # Need to Find a way to determine the week start of the date.
-
-    # querystring = https://www.billboard.com/charts/hot-100/YYYY-MM-DD
     query_string = 'https://www.billboard.com/charts/hot-100/' + date
 
     response = requests.get(query_string)
@@ -84,13 +80,10 @@ def root():
         response.headers['Access-Control-Allow-Origin'] = '*'
         # return json.dumps(server_response)
         return response
-        #return json.dumps(server_response)
 
 # Listener
 
 
 if __name__ == '__main__':
-    # This is the line for Local Debugging
-    #app.run(port=9115, debug=True)
     # This is the line for the Server
     app.run()
